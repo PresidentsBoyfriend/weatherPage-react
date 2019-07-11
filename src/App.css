@@ -39,10 +39,10 @@ body {
 }
 
 .wrapper {
-  height: 100vh;
+  height: 145vh;
   display: flex;
   flex-direction: column;   
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 
   background: rgba(45,176,224,1);
@@ -81,7 +81,6 @@ input[type="text"] {
   color: #fff;
   font-weight: lighter;
   margin-bottom: 30px;
-  margin-right: 20px;
   font-size: 20px;
   outline: none;
 }
@@ -104,6 +103,7 @@ button {
   background-color: #235d9c;
   color: #fff;
   outline: none!important;
+  margin-bottom: 20px;
 }
 
 button:hover {
@@ -141,6 +141,10 @@ button:active {
 }
 
 .wrapper form {
+  display: flex;
   margin: 20px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 

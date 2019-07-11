@@ -23,3 +23,14 @@ code {
   color: aqua;
   font-size: 20px;
 }
+
+.textWeatherTittle {
+  font-size: large;
+  color: floralwhite;
+  border-bottom: 1px solid blueviolet;
+}
+
+.textWeather {
+  font-size: large;
+  color: floralwhite;
+}
