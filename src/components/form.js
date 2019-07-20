@@ -23,7 +23,7 @@ class Form extends React.Component {
                         <p>Pressure : {this.props.weatherData.pressure} mmHg</p>
                     </div>
                     }
-                    <p>{this.props.error}</p> 
+                    <p>{this.props.weatherData.error}</p> 
                 </div>
                 }
                 { this.props.language === "ru" &&
@@ -45,7 +45,7 @@ class Form extends React.Component {
                         <p>Давление : {this.props.weatherData.pressure} мм. рт. ст.</p>
                     </div>
                     }
-                    <p>{this.props.error}</p> 
+                    <p>{this.props.weatherData.error}</p> 
                 </div>
                 }
             </div>
