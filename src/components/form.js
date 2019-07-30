@@ -1,6 +1,11 @@
 import React from "react";
 
+let value;
+
 class Form extends React.Component {
+    componentDidMount() {
+        value = this.myRef.value;
+    }
     render() {
         return (
             <div>
@@ -8,12 +13,12 @@ class Form extends React.Component {
                 <div className="btnSection  ">
                     <form  onSubmit={this.props.watherMethod}>
                         <input id="input_" type="text" name="city" placeholder="City"/>
-                        <select id="select_">
+                        <select id="select_" ref={(node)=>{this.myRef = node}}>
                             <option value="1">OpenWeatherMap</option>
                             <option value="2">WeatherBit</option>
                         </select>
                         <div>
-                            <button  >Get weather</button>
+                            <button>Get weather</button>
                         </div>
                     </form>
                     { this.props.weatherData.city && 
@@ -46,11 +51,11 @@ class Form extends React.Component {
                     </div>
                     }
                     <p>{this.props.weatherData.error}</p> 
-                </div>
+                </div>                    
                 }
             </div>
         );
     }
 }
 
-export default Form;
+export {value, Form};

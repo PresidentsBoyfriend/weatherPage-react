@@ -29,7 +29,7 @@ class Weather extends React.Component {
                         <p className="textWeather"> OpenWeatherMap погода </p>          
                         <p>Ваше местоположение : {this.props.openWeatherMap.name}, {this.props.openWeatherMap.sys.country}</p>
                         <p>Температура : {this.props.openWeatherMap.main.temp} °C</p>
-                        <p>Давление : {this.props.openWeatherMap.main.pressure} mmHg</p>
+                        <p>Давление : {this.props.openWeatherMap.main.pressure} мм. рт. ст.</p>
                     </div>
                     <div>
                         <p className="textWeather"> Weatherbit погода </p>
@@ -43,5 +43,4 @@ class Weather extends React.Component {
         )
     };
 }
-
-export default Weather;
+export {Weather};
