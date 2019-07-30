@@ -5,8 +5,7 @@ import {Weather} from "../components/weather";
 const API_KEY_OPEN_WEATHER_MAP = process.env.REACT_APP_API_KEY_OPEN_WEATHER_MAP,
       API_KEY_WEATHER_BIT = process.env.REACT_APP_API_KEY_WEATHER_BIT;
 
-let localStorageInitTime = localStorage.getItem('localStorageInitTime'),
-    language;
+let language;
 
 class App extends React.Component {
   state = {
@@ -46,7 +45,7 @@ class App extends React.Component {
   }
 
   getWeatherByPossition = async (e) => {
-    
+    let localStorageInitTime = localStorage.getItem('localStorageInitTime');
     if (localStorageInitTime === null) {
       localStorage.setItem('localStorageInitTime', +new Date());
     } 
@@ -65,9 +64,16 @@ class App extends React.Component {
   } 
   else {
     console.log("Download data on request");
-    const api_long_lat = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${this.state.startPos.coords.latitude}&lon=${this.state.startPos.coords.longitude}&appid=${API_KEY_OPEN_WEATHER_MAP}&units=metric`);
+    const api_long_lat = await fetch(`https://api.openweathermap.org/data/2.5/weather?
+                                      lat=${this.state.startPos.coords.latitude}&
+                                      lon=${this.state.startPos.coords.longitude}&
+                                      appid=${API_KEY_OPEN_WEATHER_MAP}&
+                                      units=metric`);
     const data_lon_lat = await api_long_lat.json();
-    const api_url = await fetch(`https://api.weatherbit.io/v2.0/current?&lat=${this.state.startPos.coords.latitude}&lon=${this.state.startPos.coords.longitude}&key=${API_KEY_WEATHER_BIT}`);
+    const api_url = await fetch(`https://api.weatherbit.io/v2.0/current?&
+                                 lat=${this.state.startPos.coords.latitude}&
+                                 lon=${this.state.startPos.coords.longitude}&
+                                 key=${API_KEY_WEATHER_BIT}`);
     const data = await api_url.json();
 
     localStorage.setItem("localOpenWeatherMap", JSON.stringify(data_lon_lat));
@@ -86,7 +92,9 @@ class App extends React.Component {
     localStorage.setItem("cityKey", city);
     if (value === "1"){
       if (city) {
-        const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY_OPEN_WEATHER_MAP}&units=metric`);
+        const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&
+                                     appid=${API_KEY_OPEN_WEATHER_MAP}&
+                                     units=metric`);
         const data = await api_url.json();
         if (data.name === undefined) {
           this.setState({
@@ -116,7 +124,9 @@ class App extends React.Component {
     }
     else { 
       if (city) {
-        const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY_OPEN_WEATHER_MAP}&units=metric`);
+        const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&
+                                     appid=${API_KEY_OPEN_WEATHER_MAP}&
+                                     units=metric`);
         const data = await api_url.json();
         if (data.name === undefined) {
           this.setState({
@@ -126,7 +136,8 @@ class App extends React.Component {
           });
         } 
         else {
-          const api_url_next = await fetch(`https://api.weatherbit.io/v2.0/current?city=${data.name}&key=${API_KEY_WEATHER_BIT}`);
+          const api_url_next = await fetch(`https://api.weatherbit.io/v2.0/current?city=${data.name}&
+                                            key=${API_KEY_WEATHER_BIT}`);
           const data_next = await api_url_next.json();
           this.setState({
             weatherData : {
