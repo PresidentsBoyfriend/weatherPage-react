@@ -1,13 +1,18 @@
 import React from 'react';
-import {value, Form} from "../components/form";
-import {Weather} from "../components/weather";
-
-const API_KEY_OPEN_WEATHER_MAP = process.env.REACT_APP_API_KEY_OPEN_WEATHER_MAP,
-      API_KEY_WEATHER_BIT = process.env.REACT_APP_API_KEY_WEATHER_BIT;
-
-let language;
+import Form from "../pages/form";
+import Weather from "../components/weather";
+import * as key from "../api/api";
+import { async } from 'q';
+// import checkData from "../components/checkName"
 
 class App extends React.Component {
+
+  constructor() {
+    super()
+
+    this.language = 'ru'
+  }
+
   state = {
     weatherData : {
       temp: '',
@@ -16,21 +21,33 @@ class App extends React.Component {
       pressure: '',
       error: ''
     },
-    openWeatherMap : {
-      main : {},
-      sys : {},
-    },
-    weatherBit : {
-      data : [{}],
-    },
+    openWeatherMap : '',
+    weatherBit : '',
     startPos : {},
+    options: [
+      {
+        name: 'Select…',
+        value: null,
+      },
+      {
+        name: 'Open weather map',
+        value: 'a',
+      },
+      {
+        name: 'Weather bit',
+        value: 'b',
+      },
+    ],
+    value: '',
   }
 
   componentDidMount() {
-    language = window.navigator ? (window.navigator.language ||
+    let language = window.navigator ? (window.navigator.language ||
       window.navigator.systemLanguage ||
       window.navigator.userLanguage) : "ru";
-    language = language.substr(0, 2).toLowerCase();
+ 
+      this.language = language.substr(0, 2).toLowerCase();
+
 
     let geoSuccess = (position) => {
       this.setState({
@@ -41,39 +58,41 @@ class App extends React.Component {
     navigator.geolocation.getCurrentPosition(geoSuccess);
     setTimeout(() => {
       this.getWeatherByPossition();
-    }, 0); 
+    }, 0);
   }
 
+  handleChange = (event) => {
+    this.setState({ value: event.target.value });
+  };
+
   getWeatherByPossition = async (e) => {
-    let localStorageInitTime = localStorage.getItem('localStorageInitTime');
+    let localStorageInitTime = localStorage.getItem('localStorageInitTime'),
+        limit = 3600 * 60 * 2;
     if (localStorageInitTime === null) {
       localStorage.setItem('localStorageInitTime', +new Date());
     } 
-    else if(+new Date() - localStorageInitTime > 3600) {
+    else if(+new Date() - localStorageInitTime > +limit) {
       localStorage.clear();
       localStorage.setItem('localStorageInitTime', +new Date());
     }
-  
-  if (JSON.parse(localStorage.getItem("localOpenWeatherMap"))) {
+
+  let dataJsonOpen = JSON.parse(localStorage.getItem("localOpenWeatherMap")),
+      dataJsonBit = JSON.parse(localStorage.getItem("localWeatherBit"));
+
+  if (dataJsonOpen) {
     console.log("Loading data from localStorage");
 
     this.setState({
-      openWeatherMap : JSON.parse(localStorage.getItem("localOpenWeatherMap")),
-      weatherBit : JSON.parse(localStorage.getItem("localWeatherBit")),
+      openWeatherMap : dataJsonOpen,
+      weatherBit : dataJsonBit,
     });
   } 
   else {
     console.log("Download data on request");
-    const api_long_lat = await fetch(`https://api.openweathermap.org/data/2.5/weather?
-                                      lat=${this.state.startPos.coords.latitude}&
-                                      lon=${this.state.startPos.coords.longitude}&
-                                      appid=${API_KEY_OPEN_WEATHER_MAP}&
-                                      units=metric`);
+    const api_long_lat = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${this.state.startPos.coords.latitude}&lon=${this.state.startPos.coords.longitude}&appid=${key.API_KEY_OPEN_WEATHER_MAP}&units=metric`);
     const data_lon_lat = await api_long_lat.json();
-    const api_url = await fetch(`https://api.weatherbit.io/v2.0/current?&
-                                 lat=${this.state.startPos.coords.latitude}&
-                                 lon=${this.state.startPos.coords.longitude}&
-                                 key=${API_KEY_WEATHER_BIT}`);
+
+    const api_url = await fetch(`https://api.weatherbit.io/v2.0/current?&lat=${this.state.startPos.coords.latitude}&lon=${this.state.startPos.coords.longitude}&key=${key.API_KEY_WEATHER_BIT}`);
     const data = await api_url.json();
 
     localStorage.setItem("localOpenWeatherMap", JSON.stringify(data_lon_lat));
@@ -86,94 +105,99 @@ class App extends React.Component {
   }
 }
 
-  getWeather = async (e) => {
-    e.preventDefault();
-    const city = e.target.elements.city.value; 
-    localStorage.setItem("cityKey", city);
-    if (value === "1"){
-      if (city) {
-        const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&
-                                     appid=${API_KEY_OPEN_WEATHER_MAP}&
-                                     units=metric`);
-        const data = await api_url.json();
-        if (data.name === undefined) {
-          this.setState({
-            weatherData : {
-              error: "Enter correct city name"
-            }
-          });
-        } 
-        else {
-          this.setState({
-            weatherData : {
-              temp : data.main.temp,
-              city : data.name,
-              country : data.sys.country,
-              pressure : data.main.pressure,
-            }
-          });
+  getDataOpenWeatherMap = async (city) => {
+    const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key.API_KEY_OPEN_WEATHER_MAP}&units=metric`);
+    const data = await api_url.json();
+    this.setState({
+      weatherData : {
+          temp : data.main.temp,
+          city : data.name,
+          country : data.sys.country,
+          pressure : data.main.pressure,
         }
-      }
-        else {
-        this.setState({
-          weatherData : {
-            error: "Enter city"
-          }
-        });
-      }
-    }
-    else { 
-      if (city) {
-        const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&
-                                     appid=${API_KEY_OPEN_WEATHER_MAP}&
-                                     units=metric`);
-        const data = await api_url.json();
-        if (data.name === undefined) {
-          this.setState({
-            weatherData : {
-              error: "Enter correct city name"
-            }
-          });
-        } 
-        else {
-          const api_url_next = await fetch(`https://api.weatherbit.io/v2.0/current?city=${data.name}&
-                                            key=${API_KEY_WEATHER_BIT}`);
-          const data_next = await api_url_next.json();
-          this.setState({
-            weatherData : {
-              temp : data_next.data[0].app_temp,
-              city : data_next.data[0].city_name,
-              pressure : data_next.data[0].pres,
-            }
-          });
-        }
-      }
-        else {
-        this.setState({
-          weatherData : {
-            error: "Enter city"
-          }
-        });
-      }
-    }
+      })
   }
 
+  getDataWeatherBit = async (city) => {
+    const api_url_next = await fetch(`https://api.weatherbit.io/v2.0/current?city=${city}&key=${key.API_KEY_WEATHER_BIT}`);
+    const data_next = await api_url_next.json();
+    this.setState({
+      weatherData : {
+          temp : data_next.data[0].app_temp,
+          city : data_next.data[0].city_name,
+          pressure : data_next.data[0].pres,
+        }
+      })  
+  }
+
+  getDataError = async (reason) => {
+    this.setState({
+      weatherData : {
+        error : reason
+      }
+    })
+  }
+
+  // checkData = async (city) => {
+  //   const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key.API_KEY_OPEN_WEATHER_MAP}&units=metric`);
+  //   const data = api_url.json();
+  //   return data;
+  // }
+  
+  getWeather = async (e) => {
+    e.preventDefault();
+    let reason;
+    const city = e.target.elements.city.value,
+          value = this.state.value; 
+    if (city) {
+      const api_url = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key.API_KEY_OPEN_WEATHER_MAP}&units=metric`);
+      const data = await api_url.json();
+      // const data = this.checkData(city);
+      let willDataTrue = new Promise (
+        function (resolve, reject) {
+          if (data.name === undefined) {
+            reason = new Error ("Enter correct city name");
+            reject(reason);
+          } else resolve(data);
+        }
+      );
+
+      let checkData = () => {
+        willDataTrue
+          .then( (data) => {
+            if (value === "a") {
+              this.getDataOpenWeatherMap(data.name);
+            } else if (value === "b"){
+              this.getDataWeatherBit(data.name);
+          }
+          }) 
+          .catch( () => {
+            this.getDataError(reason);
+          })
+      }
+      checkData();
+    }
+  };
+           
   render () {
+    const { options, value, weatherData, openWeatherMap, weatherBit} = this.state;
     return (
       <div className="wrapper">
         <Form 
+          options={options}
+          value={value}
           watherMethod={this.getWeather}
-          weatherData={this.state.weatherData}  
-          language = {language}
-          select = {this.state.select}
+          weatherData={weatherData}  
+          language = {this.language}
+          handleChange={this.handleChange}
         />
-        <Weather             
-          openWeatherMap = {this.state.openWeatherMap} 
-          weatherBit = {this.state.weatherBit}
-          language = {language}
-        />
-      </div>
-    );
+      <Weather  
+        openWeatherMap = {openWeatherMap} 
+        weatherBit = {weatherBit}
+        language = {this.language}
+      />
+    </div>
+    )
   }
 }
 
