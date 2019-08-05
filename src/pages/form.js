@@ -1,61 +1,64 @@
 import React from "react";
 
-let value;
-
 class Form extends React.Component {
-    componentDidMount() {
-        value = this.myRef.value;
-    }
+    
     render() {
         return (
             <div>
-                { this.props.language !== "ru" &&
+                { this.props.language !== "ru" ?
                 <div className="btnSection  ">
                     <form  onSubmit={this.props.watherMethod}>
-                        <input id="input_" type="text" name="city" placeholder="City"/>
-                        <select id="select_" ref={(node)=>{this.myRef = node}}>
-                            <option value="1">OpenWeatherMap</option>
-                            <option value="2">WeatherBit</option>
+                        <input id="input_" type="text" name="city" placeholder="City" onChange={this.props.setItem}/>
+                        <select id="select_" onChange={this.props.handleChange} value={this.props.value}>
+                        {this.props.options.map(item => (
+                                <option key={item.value} value={item.value}>
+                                {item.name}
+                                </option>
+                            ))}
                         </select>
                         <div>
                             <button>Get weather</button>
                         </div>
-                    </form>
-                    { this.props.weatherData.city && 
+                    </form> 
+                    
+                    { this.props.weatherData.city ? 
                     <div className="byString">
                         <p>City : {this.props.weatherData.city}, {this.props.weatherData.country}</p>
                         <p>Temp : {this.props.weatherData.temp} °C</p>
                         <p>Pressure : {this.props.weatherData.pressure} mmHg</p>
-                    </div>
-                    }
+                    </div> : null
+                    }  
                     <p>{this.props.weatherData.error}</p> 
-                </div>
+                </div> : null
                 }
-                { this.props.language === "ru" &&
+                { this.props.language === "ru" ?
                 <div className="btnSection  ">
                     <form  onSubmit={this.props.watherMethod}>
                         <input id="input_" type="text" name="city" placeholder="Город"/>
-                        <select id="select_">
-                            <option value="1">OpenWeatherMap</option>
-                            <option value="2">WeatherBit</option>
+                        <select id="select_" onChange={this.props.handleChange} value={this.props.value}>
+                        {this.props.options.map(item => (
+                                <option key={item.value} value={item.value}>
+                                {item.name}
+                                </option>
+                            ))}
                         </select>
                         <div>
                             <button  >Узнать погоду</button>
                         </div>
                     </form>
-                    { this.props.weatherData.city && 
+                    { this.props.weatherData.city ? 
                     <div className="byString">
                         <p>Город : {this.props.weatherData.city}, {this.props.weatherData.country}</p>
                         <p>Температура : {this.props.weatherData.temp} °C</p>
                         <p>Давление : {this.props.weatherData.pressure} мм. рт. ст.</p>
-                    </div>
+                    </div> : null
                     }
                     <p>{this.props.weatherData.error}</p> 
-                </div>                    
+                </div> : null                   
                 }
             </div>
         );
     }
 }
 
-export {value, Form};
+export default Form;

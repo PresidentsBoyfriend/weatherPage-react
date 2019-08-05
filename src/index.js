@@ -1,11 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import '../src/style/index.css';
+import App from './App/App';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
-import * as serviceWorker from './serviceWorker';
+import './App/style/App.css';
 
 ReactDOM.render(<App />, document.getElementById('root'));
-
-serviceWorker.unregister();
